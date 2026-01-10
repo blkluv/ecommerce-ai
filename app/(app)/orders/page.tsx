@@ -47,13 +47,13 @@ export default async function OrdersPage() {
         </p>
       </div>
 
-      <div className="space-y-4">
-        {orders.map((order) => {
-          const status = getOrderStatus(order.status);
-          const StatusIcon = status.icon;
-          const images = (order.itemImages ?? []).filter(
-            (url): url is string => url !== null,
-          );
+     <div className="space-y-4">
+     {orders.map((order: any) => {
+        const status = getOrderStatus(order.status);
+        const StatusIcon = status.icon;
+        const images = (order.itemImages ?? []).filter(
+           (url: string | null): url is string => url !== null,
+    );
 
           return (
             <Link
