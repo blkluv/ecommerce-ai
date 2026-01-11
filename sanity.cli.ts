@@ -1,12 +1,7 @@
-/**
- * This configuration file lets you run `$ sanity [command]` in this folder
- * Go to https://www.sanity.io/docs/cli to learn more.
- **/
+// sanity.cli.ts - FINAL VERSION
 import { defineCliConfig } from "sanity/cli";
-
 import { loadEnvConfig } from "@next/env";
 
-// Load .env.local for Sanity CLI
 loadEnvConfig(process.cwd());
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
@@ -25,4 +20,5 @@ export default defineCliConfig({
     entry: "./app/(admin)/admin/page.tsx",
   },
   api: { projectId, dataset },
+  // NO typegen config here
 });

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+// 1. Import the helper to generate real URLs
+import { urlFor } from "@/sanity/lib/image"; 
 import type { PRODUCT_BY_SLUG_QUERYResult } from "@/sanity.types";
 
 type ProductImages = NonNullable<
@@ -31,9 +33,10 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
     <div className="space-y-4">
       {/* Main Image */}
       <div className="relative aspect-square overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800">
-        {selectedImage?.asset?.url ? (
+        {/* FIXED: Use urlFor() to generate the valid URL */}
+        {selectedImage ? (
           <Image
-            src={selectedImage.asset.url}
+            src={urlFor(selectedImage).url()}
             alt={productName ?? "Product image"}
             fill
             className="object-contain"
@@ -64,19 +67,14 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                   : "hover:opacity-75",
               )}
             >
-              {image.asset?.url ? (
-                <Image
-                  src={image.asset.url}
-                  alt={`${productName} thumbnail ${index + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="100px"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center text-xs text-zinc-400">
-                  N/A
-                </div>
-              )}
+              {/* FIXED: Use urlFor() here as well */}
+              <Image
+                src={urlFor(image).url()}
+                alt={`${productName} thumbnail ${index + 1}`}
+                fill
+                className="object-cover"
+                sizes="100px"
+              />
             </button>
           ))}
         </div>

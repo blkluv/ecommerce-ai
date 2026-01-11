@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react"; // Added useEffect and useState
 import { X } from "lucide-react";
 import {
   Select,
@@ -25,6 +25,9 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // 1. ADDED: State to track if we are on the client
+  const [isMounted, setIsMounted] = useState(false);
+
   const currentSearch = searchParams.get("q") ?? "";
   const currentCategory = searchParams.get("category") ?? "";
   const currentColor = searchParams.get("color") ?? "";
@@ -40,10 +43,20 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
     urlMaxPrice,
   ]);
 
+  // 2. ADDED: Set mounted to true once the component loads in the browser
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   // Sync local state when URL changes
   useEffect(() => {
     setPriceRange([urlMinPrice, urlMaxPrice]);
   }, [urlMinPrice, urlMaxPrice]);
+
+  // 3. ADDED: Prevent server rendering of this component
+  if (!isMounted) {
+    return null; 
+  }
 
   // Check which filters are active
   const isSearchActive = !!currentSearch;

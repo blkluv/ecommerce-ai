@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { cn, formatPrice } from "@/lib/utils";
 import { AddToCartButton } from "@/components/app/AddToCartButton";
 import { StockBadge } from "@/components/app/StockBadge";
+// 1. IMPORT THE HELPER
+import { urlFor } from "@/sanity/lib/image";
 import type { FILTER_PRODUCTS_BY_NAME_QUERYResult } from "@/sanity.types";
 
 type Product = FILTER_PRODUCTS_BY_NAME_QUERYResult[number];
@@ -21,11 +23,18 @@ export function ProductCard({ product }: ProductCardProps) {
     null,
   );
 
-  const images = product.images ?? [];
-  const mainImageUrl = images[0]?.asset?.url;
+  // 2. COMPATIBILITY FIX:
+  // Your query returns 'image' (singular), but this card expects 'images' (array).
+  // We wrap the single image in an array so the rest of the code works.
+  // @ts-ignore (Ignore TS error if types haven't regenerated yet)
+  const images = product.images || (product.image ? [product.image] : []);
+
+  // 3. FIXED: Use urlFor() to generate the URL
+  const mainImageUrl = images[0] ? urlFor(images[0]).url() : null;
+  
   const displayedImageUrl =
-    hoveredImageIndex !== null
-      ? images[hoveredImageIndex]?.asset?.url
+    hoveredImageIndex !== null && images[hoveredImageIndex]
+      ? urlFor(images[hoveredImageIndex]).url()
       : mainImageUrl;
 
   const stock = product.stock ?? 0;
@@ -51,6 +60,7 @@ export function ProductCard({ product }: ProductCardProps) {
             />
           ) : (
             <div className="flex h-full items-center justify-center text-zinc-400">
+              {/* SVG Placeholder */}
               <svg
                 className="h-16 w-16 opacity-30"
                 fill="none"
@@ -101,15 +111,14 @@ export function ProductCard({ product }: ProductCardProps) {
               onMouseEnter={() => setHoveredImageIndex(index)}
               onMouseLeave={() => setHoveredImageIndex(null)}
             >
-              {image.asset?.url && (
-                <Image
-                  src={image.asset.url}
-                  alt={`${product.name} - view ${index + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="100px"
-                />
-              )}
+              {/* 4. FIXED: Use urlFor() in the loop */}
+              <Image
+                src={urlFor(image).url()}
+                alt={`${product.name} - view ${index + 1}`}
+                fill
+                className="object-cover"
+                sizes="100px"
+              />
             </button>
           ))}
         </div>

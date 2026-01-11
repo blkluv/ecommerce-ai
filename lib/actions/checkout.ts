@@ -5,6 +5,7 @@ import Stripe from "stripe";
 import { client } from "@/sanity/lib/client";
 import { PRODUCTS_BY_IDS_QUERY } from "@/lib/sanity/queries/products";
 import { getOrCreateStripeCustomer } from "@/lib/actions/customer";
+import { getSanityImageUrl } from "@/lib/sanity/image-helper";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("STRIPE_SECRET_KEY is not defined");
@@ -94,20 +95,25 @@ export async function createCheckoutSession(
 
     // 5. Create Stripe line items with validated prices
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] =
-      validatedItems.map(({ product, quantity }) => ({
-        price_data: {
-          currency: "gbp",
-          product_data: {
-            name: product.name ?? "Product",
-            images: product.image?.asset?.url ? [product.image.asset.url] : [],
-            metadata: {
-              productId: product._id,
+      validatedItems.map(({ product, quantity }) => {
+        // Get image URL using helper function
+        const imageUrl = getSanityImageUrl(product.image);
+        
+        return {
+          price_data: {
+            currency: "gbp",
+            product_data: {
+              name: product.name ?? "Product",
+              images: imageUrl ? [imageUrl] : [], // FIXED: Use helper function
+              metadata: {
+                productId: product._id,
+              },
             },
+            unit_amount: Math.round((product.price ?? 0) * 100), // Convert to pence
           },
-          unit_amount: Math.round((product.price ?? 0) * 100), // Convert to pence
-        },
-        quantity,
-      }));
+          quantity,
+        };
+      });
 
     // 6. Get or create Stripe customer
     const userEmail = user.emailAddresses[0]?.emailAddress ?? "";

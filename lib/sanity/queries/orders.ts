@@ -15,7 +15,13 @@ export const ORDERS_BY_USER_QUERY = defineQuery(`*[
   createdAt,
   "itemCount": count(items),
   "itemNames": items[].product->name,
-  "itemImages": items[].product->images[0].asset->url
+  "itemImages": items[].product->images[0]{
+    asset{
+      _id,
+      url
+    },
+    _sanityAsset
+  }
 }`);
 
 /**
@@ -39,10 +45,11 @@ export const ORDER_BY_ID_QUERY = defineQuery(`*[
       name,
       "slug": slug.current,
       "image": images[0]{
-        asset->{
+        asset{
           _id,
           url
-        }
+        },
+        _sanityAsset
       }
     }
   },
@@ -82,4 +89,3 @@ export const ORDER_BY_STRIPE_PAYMENT_ID_QUERY = defineQuery(`*[
   _type == "order"
   && stripePaymentId == $stripePaymentId
 ][0]{ _id }`);
-

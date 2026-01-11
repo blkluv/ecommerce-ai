@@ -10,11 +10,10 @@ export const ALL_CATEGORIES_QUERY = defineQuery(`*[
   _id,
   title,
   "slug": slug.current,
-  "image": image{
-    asset->{
-      _id,
-      url
-    },
+  image{
+    // FIXED: Just ask for 'asset'. 
+    // Do not ask for 'url' or '_sanityAsset' inside it.
+    asset,
     hotspot
   }
 }`);
@@ -29,11 +28,9 @@ export const CATEGORY_BY_SLUG_QUERY = defineQuery(`*[
   _id,
   title,
   "slug": slug.current,
-  "image": image{
-    asset->{
-      _id,
-      url
-    },
+  image{
+    // FIXED: Just ask for 'asset'.
+    asset,
     hotspot
   }
 }`);
